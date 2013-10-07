@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -191,6 +192,7 @@ public class Wipe {
                 throw new FileNotFoundException();
             }
             ras = new RandomAccessFile(fl, "rwd");
+            FileChannel fch = ras.getChannel();
             opened = true;
             long len = ras.length();
             final int c = this.cycles.count();
@@ -210,7 +212,7 @@ public class Wipe {
                     }
                     ras.write(d, 0, toWrite);
                     written += toWrite;
-                    
+                    fch.force(false);
                     double lvl = ofs + ((double)written / (double)c);
                     double pct = (lvl * 100.0) / (double)this.totalBytes;
                     if (!this.progress.onProcessed(pct)) {
